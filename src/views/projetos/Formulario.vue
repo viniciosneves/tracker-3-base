@@ -31,15 +31,15 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { useStore } from "@/store";
-import { ADICIONA_PROJETO, ATUALIZA_PROJETO } from "@/store/tipos-mutacoes";
 import { TipoNotificacao } from "@/interfaces/INotificacao";
 import useNotificador from "@/notificador/useNotificador";
+import { TipoAcoes } from "@/store/tipos-acoes";
 
 export default defineComponent({
   name: "ProjetosForm",
   props: {
     id: {
-      type: String,
+      type: Number,
     },
   },
   mounted() {
@@ -67,9 +67,9 @@ export default defineComponent({
           id: this.id,
           nome: this.nomeProjeto,
         };
-        this.store.commit(ATUALIZA_PROJETO, projeto);
+        this.store.dispatch(TipoAcoes.ATUALIZA_PROJETO, projeto);
       } else {
-        this.store.commit(ADICIONA_PROJETO, this.nomeProjeto);
+        this.store.dispatch(TipoAcoes.ADICIONA_PROJETO, this.nomeProjeto);
       }
       this.nomeProjeto = "";
       this.notificar(TipoNotificacao.SUCESSO, 'Projeto adicionado com sucesso', ';)')

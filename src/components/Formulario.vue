@@ -35,6 +35,7 @@
 </template>
 
 <script lang="ts">
+import IProjeto from "@/interfaces/IProjeto";
 import { useStore } from "@/store";
 import { computed, defineComponent } from "vue";
 import Temporizador from "./Temporizador.vue";
@@ -48,15 +49,17 @@ export default defineComponent({
   data() {
     return {
       descricao: "",
-      idProjeto: "",
+      idProjeto: 0,
     };
   },
   methods: {
     salvarTarefa(tempoEmSegundos: number): void {
+      const projeto = this.obterProjetoPorId(this.idProjeto) as IProjeto;
+      debugger
       this.$emit("aoSalvarTarefa", {
         duracaoEmSegundos: tempoEmSegundos,
         descricao: this.descricao,
-        projeto: this.projetos.find((p) => p.id == this.idProjeto),
+        projeto,
       });
       this.descricao = "";
     },
@@ -64,6 +67,7 @@ export default defineComponent({
   setup() {
     const store = useStore();
     return {
+      obterProjetoPorId: store.getters.obterProjetoPorId,
       projetos: computed(() => store.state.projetos),
     };
   },

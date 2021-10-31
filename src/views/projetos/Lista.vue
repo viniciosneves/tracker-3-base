@@ -37,7 +37,7 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
 import { useStore } from "@/store";
-import { REMOVE_PROJETO } from "@/store/tipos-mutacoes";
+import { TipoAcoes } from "@/store/tipos-acoes";
 
 export default defineComponent({
   name: "Lista",
@@ -48,19 +48,17 @@ export default defineComponent({
   },
   methods: {
     remover(id: string) {
-      this.store.commit(REMOVE_PROJETO, id);
+      this.store.dispatch(TipoAcoes.REMOVE_PROJETO, id);
     },
+  },
+  mounted () {
+    this.store.dispatch(TipoAcoes.LISTAR_PROJETOS)
   },
   setup() {
     const store = useStore();
     return {
       store,
-      projetos: computed(() => store.state.projetos, {
-        onTrack(e) {
-          console.log('observando')
-          debugger;
-        }
-      }),
+      projetos: computed(() => store.state.projetos),
     };
   },
 });

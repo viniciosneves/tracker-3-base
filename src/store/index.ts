@@ -2,7 +2,10 @@ import { INotificacao } from '@/interfaces/INotificacao'
 import IProjeto from '@/interfaces/IProjeto'
 import { InjectionKey } from 'vue'
 import { createStore, Store, useStore as baseUseStore, } from 'vuex'
-import { ADICIONA_PROJETO, ATUALIZA_PROJETO, NOTIFICAR, REMOVE_PROJETO } from './tipos-mutacoes'
+import { TipoAcoes } from './tipos-acoes'
+import { TipoMutacoes } from './tipos-mutacoes'
+
+import http from '@/http'
 
 interface State {
   projetos: IProjeto[],
@@ -17,27 +20,40 @@ export const store = createStore<State>({
     notificacoes: [],
   },
   mutations: {
-    [ADICIONA_PROJETO](state, nomeProjeto: string) {
-      const projeto = {
-        nome: nomeProjeto,
-        id: new Date().toISOString()
-      }
-      state.projetos.push(projeto)
+    [TipoMutacoes.DEFINIR_PROJETOS](state, projetos: IProjeto[]) {
+      state.projetos = projetos
     },
-    [ATUALIZA_PROJETO](state, projeto: IProjeto) {
-      const indice = state.projetos.findIndex(p => p.id == projeto.id)
-      state.projetos[indice] = projeto
-    },
-    [REMOVE_PROJETO](state, id: string) {
-      state.projetos = state.projetos.filter(p => p.id != id)
-    },
-    [NOTIFICAR](state, novaNotificacao: INotificacao) {
+    [TipoMutacoes.NOTIFICAR](state, novaNotificacao: INotificacao) {
       novaNotificacao.id = new Date().getTime()
       state.notificacoes.push(novaNotificacao)
       setTimeout(() => {
         state.notificacoes = state.notificacoes.filter(n => n.id != novaNotificacao.id)
       }, 3000)
     },
+  },
+  actions: {
+    [TipoAcoes.LISTAR_PROJETOS]({ commit }) {
+      http.get('projetos')
+        .then(resposta => commit(TipoMutacoes.DEFINIR_PROJETOS, resposta.data))
+    },
+    [TipoAcoes.ADICIONA_PROJETO]({ dispatch }, nome: string) {
+      http.post('projetos', {
+        nome
+      }).then(() => dispatch(TipoAcoes.LISTAR_PROJETOS))
+    },
+    [TipoAcoes.ATUALIZA_PROJETO]({ dispatch }, projeto: IProjeto) {
+      http.put(`projetos/${projeto.id}`, projeto)
+        .then(() => dispatch(TipoAcoes.LISTAR_PROJETOS))
+    },
+    [TipoAcoes.REMOVE_PROJETO]({ dispatch }, id: number) {
+      http.delete(`projetos/${id}`)
+        .then(() => dispatch(TipoAcoes.LISTAR_PROJETOS))
+    },
+  },
+  getters: {
+    obterProjetoPorId: (state) => (id: number) => {
+      return state.projetos.find(projeto => projeto.id === id)
+    }
   }
 })
 
