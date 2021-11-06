@@ -16,7 +16,7 @@
       <div class="column is-3">
         <div class="select">
           <select v-model="idProjeto">
-            <option value="">Selecione o projeto</option>
+            <option value="0" disabled>Selecione o projeto</option>
             <option
               :value="projeto.id"
               v-for="projeto in projetos"
@@ -55,7 +55,6 @@ export default defineComponent({
   methods: {
     salvarTarefa(tempoEmSegundos: number): void {
       const projeto = this.obterProjetoPorId(this.idProjeto) as IProjeto;
-      debugger
       this.$emit("aoSalvarTarefa", {
         duracaoEmSegundos: tempoEmSegundos,
         descricao: this.descricao,

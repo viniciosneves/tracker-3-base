@@ -1,14 +1,19 @@
 import { INotificacao } from '@/interfaces/INotificacao'
 import IProjeto from '@/interfaces/IProjeto'
+import ITarefa from '@/interfaces/ITarefa'
 import { InjectionKey } from 'vue'
 import { createStore, Store, useStore as baseUseStore, } from 'vuex'
-import { TipoAcoes } from './tipos-acoes'
 import { TipoMutacoes } from './tipos-mutacoes'
 
-import http from '@/http'
+import { actions as actionsProjeto } from './projetos/actions'
+import { mutations as mutationsProjeto } from './projetos/mutations'
 
-interface State {
+import { actions as actionsTarefas } from './tarefas/actions'
+import { mutations as mutationsTarefas } from './tarefas/mutations'
+
+export interface State {
   projetos: IProjeto[],
+  tarefas: ITarefa[],
   notificacoes: INotificacao[]
 }
 
@@ -17,12 +22,12 @@ export const key: InjectionKey<Store<State>> = Symbol()
 export const store = createStore<State>({
   state: {
     projetos: [],
+    tarefas: [],
     notificacoes: [],
   },
   mutations: {
-    [TipoMutacoes.DEFINIR_PROJETOS](state, projetos: IProjeto[]) {
-      state.projetos = projetos
-    },
+    ...mutationsProjeto,
+    ...mutationsTarefas,
     [TipoMutacoes.NOTIFICAR](state, novaNotificacao: INotificacao) {
       novaNotificacao.id = new Date().getTime()
       state.notificacoes.push(novaNotificacao)
@@ -32,23 +37,8 @@ export const store = createStore<State>({
     },
   },
   actions: {
-    [TipoAcoes.LISTAR_PROJETOS]({ commit }) {
-      http.get('projetos')
-        .then(resposta => commit(TipoMutacoes.DEFINIR_PROJETOS, resposta.data))
-    },
-    [TipoAcoes.ADICIONA_PROJETO]({ dispatch }, nome: string) {
-      http.post('projetos', {
-        nome
-      }).then(() => dispatch(TipoAcoes.LISTAR_PROJETOS))
-    },
-    [TipoAcoes.ATUALIZA_PROJETO]({ dispatch }, projeto: IProjeto) {
-      http.put(`projetos/${projeto.id}`, projeto)
-        .then(() => dispatch(TipoAcoes.LISTAR_PROJETOS))
-    },
-    [TipoAcoes.REMOVE_PROJETO]({ dispatch }, id: number) {
-      http.delete(`projetos/${id}`)
-        .then(() => dispatch(TipoAcoes.LISTAR_PROJETOS))
-    },
+    ...actionsProjeto,
+    ...actionsTarefas,
   },
   getters: {
     obterProjetoPorId: (state) => (id: number) => {
