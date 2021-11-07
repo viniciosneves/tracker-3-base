@@ -19,14 +19,9 @@
       :key="index"
       @aoClicado="abrirModal(tarefa)"
     />
-    <div class="modal" :class="{ 'is-active': tarefaSelecionada != null }">
-      <div class="modal-background"></div>
-      <form
-        class="modal-card"
-        @submit.prevent="atualizarTarefa"
-        v-if="tarefaSelecionada"
-      >
-        <header class="modal-card-head">
+    <form @submit.prevent="atualizarTarefa" v-if="tarefaSelecionada">
+      <TrackerModal :mostrar="tarefaSelecionada">
+        <template v-slot:cabecalho>
           <p class="modal-card-title">Editando a tarefa</p>
           <button
             type="button"
@@ -34,8 +29,8 @@
             aria-label="close"
             @click="fecharModal"
           ></button>
-        </header>
-        <section class="modal-card-body">
+        </template>
+        <template v-slot:corpo>
           <div class="field">
             <label class="label">Nome do projeto</label>
             <div class="control">
@@ -48,15 +43,18 @@
               />
             </div>
           </div>
-        </section>
-        <footer class="modal-card-foot is-justify-content-flex-end">
-          <button @click="fecharModal" type="button" class="button is-danger">
-            Cancelar
-          </button>
-          <button class="button is-success">Salvar</button>
-        </footer>
-      </form>
-    </div>
+        </template>
+        <template v-slot:rodape>
+          <TrackerBtn
+            @aoClicado="fecharModal"
+            tipo="button"
+            contexto="is-danger"
+            texto="Cancelar"
+          />
+          <TrackerBtn contexto="is-success" texto="Salvar" />
+        </template>
+      </TrackerModal>
+    </form>
   </div>
 </template>
 
@@ -65,6 +63,8 @@ import { defineComponent, computed, onMounted, ref } from "vue";
 import Formulario from "../components/Formulario.vue";
 import Tarefa from "../components/Tarefa.vue";
 import Box from "../components/Box.vue";
+import TrackerBtn from "../components/TrackerBtn.vue";
+import TrackerModal from "../components/TrackerModal.vue";
 import ITarefa from "../interfaces/ITarefa";
 import { useStore } from "@/store";
 import { TipoAcoes } from "@/store/tipos-acoes";
@@ -75,6 +75,8 @@ export default defineComponent({
     Formulario,
     Tarefa,
     Box,
+    TrackerBtn,
+    TrackerModal,
   },
   data() {
     return {
