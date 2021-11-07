@@ -29,60 +29,58 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useStore } from "@/store";
 import { TipoNotificacao } from "@/interfaces/INotificacao";
 import useNotificador from "@/notificador/useNotificador";
 import { TipoAcoes } from "@/store/tipos-acoes";
+import { useRoute, useRouter } from "vue-router";
 
 export default defineComponent({
   name: "ProjetosForm",
-  props: {
-    id: {
-      type: Number,
-    },
-  },
-  mounted() {
-    if (this.id) {
-      const projeto = this.store.state.projetos.find((p) => p.id == this.id);
-      if (projeto) {
-        this.nomeProjeto = projeto.nome;
-      }
-    }
-  },
-  data() {
-    return {
-      nomeProjeto: "",
-    };
-  },
   computed: {
     titulo(): string {
-      return this.id ? "Editando projeto" : "Novo projeto";
-    },
-  },
-  methods: {
-    salvar(): void {
-      if (this.id) {
-        const projeto = {
-          id: this.id,
-          nome: this.nomeProjeto,
-        };
-        this.store.dispatch(TipoAcoes.ATUALIZA_PROJETO, projeto);
-      } else {
-        this.store.dispatch(TipoAcoes.ADICIONA_PROJETO, this.nomeProjeto);
-      }
-      this.nomeProjeto = "";
-      this.notificar(TipoNotificacao.SUCESSO, 'Projeto adicionado com sucesso', ';)')
-
-      this.$router.push("/projetos");
+      return this.$route.params.id ? "Editando projeto" : "Novo projeto";
     },
   },
   setup() {
     const store = useStore();
+    const route = useRoute()
+    const router = useRouter();
     const { notificar } = useNotificador()
+    const nomeProjeto = ref('')
+    const id = route.params.id as string
+    
+    onMounted(() => {
+      if (id) {
+        const projeto = store.state.projetos.find((p) => p.id == parseInt(id));
+        if (projeto) {
+          nomeProjeto.value = projeto.nome;
+        }
+      }
+    })
+
+    const salvar = () => {
+      if (id) {
+        const projeto = {
+          id: id,
+          nome: nomeProjeto.value,
+        };
+        store.dispatch(TipoAcoes.ATUALIZA_PROJETO, projeto);
+      } else {
+        store.dispatch(TipoAcoes.ADICIONA_PROJETO, nomeProjeto.value);
+      }
+      nomeProjeto.value = "";
+      notificar(TipoNotificacao.SUCESSO, 'Projeto adicionado com sucesso', ';)')
+
+      router.push("/projetos");
+    }
+
     return {
+      nomeProjeto,
       store,
-      notificar
+      notificar,
+      salvar
     };
   },
 });

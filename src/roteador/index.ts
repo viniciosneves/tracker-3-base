@@ -26,7 +26,6 @@ const rotas: Array<RouteRecordRaw> = [
       },
       {
         path: ':id',
-        props: true,
         component: Formulario
       }
     ]

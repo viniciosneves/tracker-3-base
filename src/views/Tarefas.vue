@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "vue";
+import { defineComponent, computed, onMounted } from "vue";
 import Formulario from "../components/Formulario.vue";
 import Tarefa from "../components/Tarefa.vue";
 import Box from "../components/Box.vue";
@@ -97,12 +97,12 @@ export default defineComponent({
       return this.tarefas.length == 0;
     },
   },
-  mounted() {
-    this.store.dispatch(TipoAcoes.LISTAR_PROJETOS);
-    this.store.dispatch(TipoAcoes.LISTAR_TAREFAS);
-  },
   setup() {
     const store = useStore();
+    onMounted(() => {
+      store.dispatch(TipoAcoes.LISTAR_PROJETOS);
+      store.dispatch(TipoAcoes.LISTAR_TAREFAS);
+    })
     return {
       store,
       projetos: computed(() => store.state.projetos),

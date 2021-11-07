@@ -28,27 +28,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "BarraLateral",
   emits: ["aoAlterarModo"],
-  data() {
-    return {
-      modoEscuro: false,
-    };
-  },
-  methods: {
-    alterarModo(): void {
-      this.modoEscuro = !this.modoEscuro;
-      this.$emit("aoAlterarModo", this.modoEscuro);
-    },
-  },
   computed: {
     textoBtn(): string {
       return this.modoEscuro ? "claro" : "escuro";
     },
   },
+  setup (props, { emit }) {
+    const modoEscuro = ref(false)
+    const alterarModo = (): void => {
+      modoEscuro.value = !modoEscuro.value;
+      emit("aoAlterarModo", modoEscuro.value);
+    }
+    return {
+      modoEscuro,
+      alterarModo
+    }
+  }
 });
 </script>
 <style scoped>

@@ -7,28 +7,36 @@
       <router-view/>
     </div>
     <Notificacoes />
+    <Loader :mostrar="!carregando"/>
   </main>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import BarraLateral from "./components/BarraLateral.vue";
+import Loader from "./components/Loader.vue";
 import Notificacoes from "./components/Notificacoes.vue";
+import { useStore } from "./store";
 
 export default defineComponent({
   name: "App",
   components: {
     BarraLateral,
-    Notificacoes
+    Notificacoes,
+    Loader
   },
-  data () {
-    return {
-      modoEscuro: false
+  setup() {
+    const store = useStore()
+    const modoEscuro = ref(false)
+
+    const alterarModo = (modo: boolean) : void => {
+      modoEscuro.value = modo
     }
-  },
-  methods: {
-    alterarModo (modoEscuro: boolean) : void {
-      this.modoEscuro = modoEscuro
+
+    return {
+      modoEscuro,
+      alterarModo,
+      carregando: computed(() => store.getters.loading)
     }
   }
 });
