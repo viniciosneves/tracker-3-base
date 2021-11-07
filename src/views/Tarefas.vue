@@ -1,10 +1,18 @@
 <template>
   <Formulario @aoSalvarTarefa="salvarTarefa" />
   <div class="lista">
-    <Box v-if="semTarefas">
+    <Box v-if="semTarefas && !filtro">
       Você não está muito produtivo hoje
       <span class="has-text-weight-bold">:(</span>
     </Box>
+    <div class="field">
+      <input
+        class="input"
+        type="text"
+        placeholder="Filtrar tarefas"
+        v-model="filtro"
+      />
+    </div>
     <Tarefa
       v-for="(tarefa, index) in tarefas"
       :tarefa="tarefa"
@@ -53,7 +61,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, onMounted } from "vue";
+import { defineComponent, computed, onMounted, ref } from "vue";
 import Formulario from "../components/Formulario.vue";
 import Tarefa from "../components/Tarefa.vue";
 import Box from "../components/Box.vue";
@@ -99,14 +107,22 @@ export default defineComponent({
   },
   setup() {
     const store = useStore();
+    const filtro = ref("");
     onMounted(() => {
       store.dispatch(TipoAcoes.LISTAR_PROJETOS);
       store.dispatch(TipoAcoes.LISTAR_TAREFAS);
-    })
+    });
+
+    const tarefas = computed(() =>
+      store.state.tarefas.filter(
+        (t) => !filtro.value || t.descricao.includes(filtro.value)
+      )
+    );
     return {
       store,
+      filtro,
       projetos: computed(() => store.state.projetos),
-      tarefas: computed(() => store.state.tarefas),
+      tarefas,
     };
   },
 });

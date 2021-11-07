@@ -7,7 +7,7 @@
       <router-view/>
     </div>
     <Notificacoes />
-    <Loader :mostrar="!carregando"/>
+    <Loader :mostrar="carregando"/>
   </main>
 </template>
 
