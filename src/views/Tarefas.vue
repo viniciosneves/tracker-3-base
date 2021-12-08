@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, onMounted, ref } from "vue";
+import { defineComponent, computed, onMounted, ref, watchEffect, watch } from "vue";
 import Formulario from "../components/Formulario.vue";
 import Tarefa from "../components/Tarefa.vue";
 import Box from "../components/Box.vue";
@@ -114,6 +114,16 @@ export default defineComponent({
       store.dispatch(TipoAcoes.LISTAR_PROJETOS);
       store.dispatch(TipoAcoes.LISTAR_TAREFAS);
     });
+
+    // watchEffect(() => {
+    //   store.dispatch(TipoAcoes.LISTAR_TAREFAS, filtro.value);
+    // })
+
+    // watch(filtro, (valorAtual, valorAntigo) => {
+    //   if (valorAtual != valorAntigo) {
+    //     store.dispatch(TipoAcoes.LISTAR_TAREFAS, valorAtual);
+    //   }
+    // })
 
     const tarefas = computed(() =>
       store.state.tarefas.filter(
